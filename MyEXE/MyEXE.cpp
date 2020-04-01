@@ -2,10 +2,19 @@
 //
 
 #include <iostream>
+#include <MyLIB.h>
+#include <MyDLL.h>
 
-int main()
-{
-    std::cout << "Hello World!\n";
+int main() {
+	fnMyLIB(std::cout);
+
+	fnMyDLLWithDllExport(std::cout);
+	fnMyDLLWithExternC(std::cout);
+	fnMyDLLWithDefFile(std::cout);
+
+	std::cout << "this is my exe.\n";
+
+	system("PAUSE");
 }
 
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单

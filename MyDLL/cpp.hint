@@ -1,0 +1,2 @@
+#define MYDLL_API __declspec(dllexport)
+#define MYDLL_API __declspec(dllimport)
