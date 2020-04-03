@@ -4,26 +4,64 @@
 #include <iostream>
 #include <MyLIB.h>
 #include <MyDLL.h>
+#include <Windows.h>
 
-int main() {
-	fnMyLIB(std::cout);
-
+void dllLinkImplicitly() {
 	fnMyDLLWithDllExport(std::cout);
 	fnMyDLLWithExternC(std::cout);
 	fnMyDLLWithDefFile(std::cout);
+}
+
+void dllLinkExplicitly() {
+	typedef void(*LPFNDLLFUNC)(std::ostream &); 
+	// equal to
+	// using LPFNDLLFUNC = void(*)(std::ostream &);
+	
+	HINSTANCE hDLL;                     // Handle to DLL
+	LPFNDLLFUNC lpfnMyDLLWithDllExport; // Function pointer
+	LPFNDLLFUNC lpfnMyDLLWithExternC;   // Function pointer
+	LPFNDLLFUNC lpfnMyDLLWithDefFile;   // Function pointer
+
+	hDLL = LoadLibrary("MyDLL.dll");
+	if (hDLL != NULL)
+	{
+		lpfnMyDLLWithDllExport = (LPFNDLLFUNC)GetProcAddress(hDLL, "fnMyDLLWithDllExport");
+		lpfnMyDLLWithExternC = (LPFNDLLFUNC)GetProcAddress(hDLL, "fnMyDLLWithExternC");
+		lpfnMyDLLWithDefFile = (LPFNDLLFUNC)GetProcAddress(hDLL, "fnMyDLLWithDefFile");
+
+		if (!lpfnMyDLLWithDllExport) { // handle the error
+			std::cout << "fnMyDLLWithDllExport load error.\n";
+		}
+		else { // call the function
+			lpfnMyDLLWithDllExport(std::cout);
+		}
+
+		if (!lpfnMyDLLWithExternC) {
+			std::cout << "lpfnMyDLLWithExternC load error.\n";
+		}
+		else {
+			lpfnMyDLLWithExternC(std::cout);
+		}
+
+		if (!lpfnMyDLLWithDefFile) {
+			std::cout << "lpfnMyDLLWithDefFile load error.\n";
+		}
+		else {
+			lpfnMyDLLWithDefFile(std::cout);
+		}
+	}
+	FreeLibrary(hDLL);
+}
+
+int main() {
+	
+	fnMyLIB(std::cout);
+
+	dllLinkImplicitly();
+
+	dllLinkExplicitly();
 
 	std::cout << "this is my exe.\n";
 
 	system("PAUSE");
 }
-
-// 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
-// 调试程序: F5 或调试 >“开始调试”菜单
-
-// 入门使用技巧: 
-//   1. 使用解决方案资源管理器窗口添加/管理文件
-//   2. 使用团队资源管理器窗口连接到源代码管理
-//   3. 使用输出窗口查看生成输出和其他消息
-//   4. 使用错误列表窗口查看错误
-//   5. 转到“项目”>“添加新项”以创建新的代码文件，或转到“项目”>“添加现有项”以将现有代码文件添加到项目
-//   6. 将来，若要再次打开此项目，请转到“文件”>“打开”>“项目”并选择 .sln 文件
